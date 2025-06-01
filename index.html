@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বাংলাদেশ ডিজিটাল ভোটিং</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #dff1ff, #ffffff);
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    h1, h2 {
+      color: #006a4e;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    p {
+      margin-bottom: 20px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    input[type="text"], input[type="number"], input[type="email"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 12px 24px;
+      background-color: #006a4e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #004f36;
+    }
+
+    img {
+      display: block;
+      margin: 20px auto;
+      border-radius: 10px;
+      max-width: 200px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="page1" class="page active">
+      <h1>বাংলাদেশ ডিজিটাল ভোটিং</h1>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Flag_of_Bangladesh.svg" alt="বাংলাদেশের পতাকা">
+      <p>এই ওয়েবসাইটটি বাংলাদেশ সরকারের নির্বাচন প্রক্রিয়া ডিজিটালভাবে সম্পাদনের জন্য তৈরি। এখানে আপনি ধাপে ধাপে তথ্য দিয়ে ভোট প্রদান করতে পারবেন।</p>
+      <button onclick="validatePage1()">Next</button>
+    </div>
+
+    <div id="page2" class="page">
+      <h2>ব্যক্তিগত তথ্য</h2>
+      <form id="infoForm">
+        <input type="text" id="name" placeholder="আপনার নাম" required><br>
+        <input type="number" id="age" placeholder="আপনার বয়স" required><br>
+        <input type="text" id="fatherName" placeholder="আপনার পিতার নাম" required><br>
+        <input type="text" id="location" placeholder="আপনি কোথায় থাকেন" required><br>
+        <input type="text" id="address" placeholder="আপনার স্থায়ী ঠিকানা" required><br>
+        <input type="email" id="email" placeholder="আপনার ইমেইল" required><br>
+      </form>
+      <button onclick="validatePage2()">Next</button>
+    </div>
+
+    <div id="page3" class="page">
+      <h2>NID কার্ড তথ্য</h2>
+      <p>NID কার্ড আপলোড করুন বা ক্যামেরা ব্যবহার করে ছবি তুলুন।</p>
+      <input type="file" accept="image/*" id="nidUpload" required><br>
+      <button onclick="validateNID()">Next</button>
+      <p id="nidWarning" style="color:red; display:none;">একাধিকবার NID আপলোড করা যাবে না।</p>
+    </div>
+
+    <div id="page4" class="page">
+      <h2>ভোট দিন</h2>
+      <p>আপনার পছন্দের দল নির্বাচন করুন:</p>
+      <form id="voteForm">
+        <label><input type="radio" name="vote" value="আওয়ামী লীগ"> আওয়ামী লীগ</label><br>
+        <label><input type="radio" name="vote" value="বিএনপি"> বিএনপি</label><br>
+        <label><input type="radio" name="vote" value="জামায়াত"> জামায়াত পার্টি</label><br>
+        <label><input type="radio" name="vote" value="জাতীয় পার্টি"> জাতীয় পার্টি</label><br>
+        <label><input type="radio" name="vote" value="অন্যান্য"> অন্যান্য</label><br>
+      </form>
+      <button onclick="submitVote()">Next</button>
+    </div>
+
+    <div id="page5" class="page">
+      <h2>ধন্যবাদ</h2>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Flag_of_Bangladesh.svg" alt="বাংলাদেশ">
+      <p>আপনার ডিজিটাল ভোট প্রদান করার জন্য ধন্যবাদ।</p>
+    </div>
+  </div>
+
+  <script>
+    let nidUploaded = false;
+    let submittedVotes = [];
+
+    function nextPage(pageNumber) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page' + pageNumber).classList.add('active');
+    }
+
+    function validatePage1() {
+      nextPage(2);
+    }
+
+    function validatePage2() {
+      const name = document.getElementById('name').value.trim();
+      const age = document.getElementById('age').value.trim();
+      const father = document.getElementById('fatherName').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (name && age && father && location && address && email) {
+        nextPage(3);
+      } else {
+        alert("সব তথ্য পূরণ করুন");
+      }
+    }
+
+    function validateNID() {
+      const fileInput = document.getElementById('nidUpload');
+
+      if (nidUploaded) {
+        document.getElementById('nidWarning').style.display = 'block';
+      } else if (fileInput.files.length > 0) {
+        nidUploaded = true;
+        nextPage(4);
+      } else {
+        alert("দয়া করে NID আপলোড করুন");
+      }
+    }
+
+    function submitVote() {
+      const vote = document.querySelector('input[name="vote"]:checked');
+      if (!vote) {
+        alert("দয়া করে একটি দল নির্বাচন করুন");
+        return;
+      }
+
+      const voterData = {
+        name: document.getElementById('name').value,
+        age: document.getElementById('age').value,
+        fatherName: document.getElementById('fatherName').value,
+        location: document.getElementById('location').value,
+        address: document.getElementById('address').value,
+        email: document.getElementById('email').value,
+        vote: vote.value,
+        timestamp: new Date().toLocaleString()
+      };
+
+      submittedVotes.push(voterData);
+      console.log("ভোট সাবমিট হয়েছে:", voterData);
+      nextPage(5);
+    }
+  </script>
+</body>
+</html>
